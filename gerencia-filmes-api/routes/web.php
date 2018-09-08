@@ -11,6 +11,22 @@
 |
 */
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('welcome');
+});*/
+
+Route::group(array('prefix' => 'api'), function(){
+
+  Route::get('/', function(){
+    return response()->json(['message' => 'Gerencia Filmes API', 'status' => 'Connected']);;
+  });
+
+  Route::resource('filmes','FilmesController');
+  Route::resource('filmes_assistidos','FilmesAssistidosController');
+  Route::resource('ano_meta','AnoMetaController');
+
+});
+
+Route::get('/', function(){
+  return redirect('api');
 });
