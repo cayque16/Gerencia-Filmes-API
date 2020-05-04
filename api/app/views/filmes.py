@@ -9,3 +9,6 @@ def get_filmes():
 		return jsonify({'message': 'successfully fetched', 'data': result}), 201
 
 	return jsonify({'message': "user don't exist", 'data': {}}), 404
+
+# def get_filmes_usuario(id,ano):
+
