@@ -1,6 +1,6 @@
 from app import app
 from flask import jsonify
-from ..views import filmes,filmes_assistidos,usuarios
+from ..views import filmes,filmes_assistidos,usuarios,ano_meta
 
 @app.route('/', methods=['GET'])
 def root():
@@ -17,3 +17,7 @@ def get_assistidos():
 @app.route('/usuarios', methods=['GET'])
 def get_usuarios():
 	return usuarios.get_usuarios()
+
+@app.route('/metas', methods=['GET'])
+def get_metas():
+	return ano_meta.get_metas()
