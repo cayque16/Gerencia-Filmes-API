@@ -10,14 +10,16 @@ class Filmes(db.Model):
 	duracao = db.Column(db.Integer)
 	nota = db.Column(db.Float)
 	poster = db.Column(db.String(300))
+	filmes_assistidos = db.relationship('FilmesAssistidos', backref='Filmes',lazy=True)
 
-	def __init__(self,imdbID,titulo,ano,duracao,nota,poster):
+	def __init__(self,imdbID,titulo,ano,duracao,nota,poster,filmes_assistidos):
 		self.imdbID = imdbID
 		self.titulo = titulo
 		self.ano = ano
 		self.duracao = duracao
 		self.nota = nota
 		self.poster = poster
+		# self.filmes_assistidos = filmes_assistidos
 
 class FilmeSchema(ma.Schema):
 	class Meta:
