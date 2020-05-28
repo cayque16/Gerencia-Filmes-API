@@ -44,3 +44,6 @@ class Filmesassistidos(models.Model):
     class Meta:
         managed = True
         db_table = 'FilmesAssistidos'
+
+    def get_data_assistido(self):
+        return self.data.strftime('%d/%m/%Y')

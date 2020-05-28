@@ -9,13 +9,21 @@ def lista_filmes(request):
     return JsonResponse(list(filmes),safe=False)
 
 def lista_filmes_user_do_ano(request,ano):
-    usuario = request.user
-    ano_meta = Anometa.objects.get(ano=ano,usuario=usuario)
-    filmes_assistidos = Filmesassistidos.objects.filter(usuario=usuario,idanometa=ano_meta.id).values('idfilme')
+    # usuario = request.user
+    ano_meta = Anometa.objects.get(ano=ano)
+    filmes_assistidos = Filmesassistidos.objects.filter(idanometa=ano_meta.id)
     result = []
     for i in filmes_assistidos:
-        filme = {}
-        filme['id'] = Filmes.objects.get(id=i['idfilme']).id
-        filme['titulo'] = Filmes.objects.get(id=i['idfilme']).titulo
-        result.append(filme)
+        filme = i.idfilme
+        # print(i.idfilme)
+        dados = {}
+        dados['posano'] = i.posano
+        dados['titulo'] = filme.titulo
+        dados['ano'] = filme.ano
+        dados['duracao'] = filme.duracao
+        dados['nota'] = filme.nota
+        dados['poster'] = filme.poster
+        dados['data'] = i.get_data_assistido()
+        dados['inedito'] = i.inedito
+        result.append(dados)
     return JsonResponse(result,safe=False)
