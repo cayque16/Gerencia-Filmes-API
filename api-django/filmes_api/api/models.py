@@ -46,4 +46,5 @@ class Filmesassistidos(models.Model):
         db_table = 'FilmesAssistidos'
 
     def get_data_assistido(self):
-        return self.data.strftime('%d/%m/%Y')
+        mes = ('janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro')
+        return str(self.data.day) + ' de ' + mes[self.data.month-1] + ' de ' + str(self.data.year)

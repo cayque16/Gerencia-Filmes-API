@@ -11,7 +11,7 @@ def lista_filmes(request):
 def lista_filmes_user_do_ano(request,ano):
     # usuario = request.user
     ano_meta = Anometa.objects.get(ano=ano)
-    filmes_assistidos = Filmesassistidos.objects.filter(idanometa=ano_meta.id)
+    filmes_assistidos = Filmesassistidos.objects.filter(idanometa=ano_meta.id).order_by('posano')
     result = []
     for i in filmes_assistidos:
         filme = i.idfilme
