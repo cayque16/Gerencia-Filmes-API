@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('filmes/api/filmes/', views.lista_filmes),
     path('filmes/api/filmes/<int:ano>', views.lista_filmes_user_do_ano),
+    path('filmes/api/anosmeta/', views.lista_anosmeta),
 ]
