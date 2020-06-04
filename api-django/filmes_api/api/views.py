@@ -38,3 +38,14 @@ def lista_anosmeta(request):
         dados['meta'] = i.meta
         result.append(dados)
     return JsonResponse(result,safe=False)
+
+def get_anometa(request,ano):
+    dados = {}
+    try:
+        ano_meta = Anometa.objects.get(ano=ano)
+    except Exception:
+        return JsonResponse(dados)    
+    dados['id'] = ano_meta.id
+    dados['ano'] = ano_meta.ano
+    dados['meta'] = ano_meta.meta
+    return JsonResponse(dados)
