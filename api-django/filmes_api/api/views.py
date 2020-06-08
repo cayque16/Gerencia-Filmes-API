@@ -17,13 +17,16 @@ def lista_filmes_user_do_ano(request,ano):
         filme = i.idfilme
         # print(i.idfilme)
         dados = {}
+        dados['idFilme'] = filme.id
         dados['posano'] = i.posano
         dados['titulo'] = filme.titulo
         dados['ano'] = filme.ano
         dados['duracao'] = filme.duracao
         dados['nota'] = filme.nota
         dados['poster'] = filme.poster
-        dados['data'] = i.get_data_assistido()
+        dados['dataDia'] = i.get_data_dia()
+        dados['dataMes'] = i.get_data_mes()
+        dados['dataAno'] = i.get_data_ano()
         dados['inedito'] = i.inedito
         result.append(dados)
     return JsonResponse(result,safe=False)
@@ -48,4 +51,18 @@ def get_anometa(request,ano):
     dados['id'] = ano_meta.id
     dados['ano'] = ano_meta.ano
     dados['meta'] = ano_meta.meta
+    return JsonResponse(dados)
+
+def get_filme(request,id):
+    dados = {}
+    try:
+        filme = Filmes.objects.get(id=id)
+    except Exception:
+        return JsonResponse(dados)
+    dados['imdbid'] = filme.imdbid
+    dados['titulo'] = filme.titulo
+    dados['ano'] = filme.ano
+    dados['duracao'] = filme.duracao
+    dados['nota'] = filme.nota
+    dados['poster'] = filme.poster
     return JsonResponse(dados)

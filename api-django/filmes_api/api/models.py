@@ -48,3 +48,12 @@ class Filmesassistidos(models.Model):
     def get_data_assistido(self):
         mes = ('janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro')
         return str(self.data.day) + ' de ' + mes[self.data.month-1] + ' de ' + str(self.data.year)
+
+    def get_data_dia(self):
+        return self.data.day
+
+    def get_data_mes(self):
+        return self.data.month
+
+    def get_data_ano(self):
+        return self.data.year
