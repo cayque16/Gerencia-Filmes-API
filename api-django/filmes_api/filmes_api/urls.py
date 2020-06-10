@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 from api import views
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
     path('filmes/api/filmes/', views.lista_filmes),
     path('filmes/api/filmes/<int:ano>', views.lista_filmes_user_do_ano),
     path('filmes/api/filmes/getfilme/<int:id>', views.get_filme),
+    path('filmes/api/filmesassistido/post/', csrf_exempt(views.set_filme_assistido)),
     path('filmes/api/anosmeta/', views.lista_anosmeta),
     path('filmes/api/anosmeta/<int:ano>', views.get_anometa),
 ]

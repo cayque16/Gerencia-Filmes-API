@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from api.models import Filmes,Anometa,Filmesassistidos
 from django.http.response import JsonResponse
+from django.db.models import Max
+from django.contrib.auth.models import User
+import json
+from datetime import datetime
 
 # Create your views here.
 
@@ -17,6 +21,7 @@ def lista_filmes_user_do_ano(request,ano):
         filme = i.idfilme
         # print(i.idfilme)
         dados = {}
+        dados['id'] = i.id
         dados['idFilme'] = filme.id
         dados['posano'] = i.posano
         dados['titulo'] = filme.titulo
@@ -66,3 +71,33 @@ def get_filme(request,id):
     dados['nota'] = filme.nota
     dados['poster'] = filme.poster
     return JsonResponse(dados)
+
+def set_filme_assistido(request):
+    body = json.loads(request.body)
+    try:
+        filme = Filmes.objects.get(imdbid=body['imdbId'])
+    except Exception:
+        Filmes.objects.create(
+            imdbid = body['imdbId'],
+            titulo = body['titulo'],
+            ano = body['ano'],
+            duracao = body['duracao'],
+            nota = body['nota'],
+            poster = body['poster']
+        )
+        filme = Filmes.objects.get(imdbid=body['imdbId'])
+    ano = body['data'].split('/')[2]
+    anoMeta = Anometa.objects.get(ano=ano)
+    maxPosDoAno = Filmesassistidos.objects.filter(idanometa=anoMeta).aggregate(Max('posano'))
+    posAno = maxPosDoAno['posano__max'] + 1
+    user = User.objects.get(id=1)
+    Filmesassistidos.objects.create(
+        idfilme = filme,
+        usuario = user, #aqui vai o usuario logado
+        idanometa = anoMeta,
+        posano = posAno,
+        data = datetime.strptime(body['data'], '%d/%m/%Y').date(),
+        inedito = body['inedito']
+    )
+
+    return JsonResponse({},status=200)
