@@ -77,6 +77,15 @@ def get_filme(request,id):
     dados['poster'] = filme.poster
     return JsonResponse(dados)
 
+def altera_ano_meta(request):
+    body = json.loads(request.body)
+
+    anoMeta = Anometa.objects.get(ano=body['ano'])
+    anoMeta.meta = body['meta']
+    anoMeta.save()
+    
+    return JsonResponse({},status=200)
+
 def set_filme_assistido(request):
     body = json.loads(request.body)
     try:

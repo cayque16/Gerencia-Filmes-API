@@ -25,5 +25,6 @@ urlpatterns = [
     path('filmes/api/filmes/getfilme/<int:id>', views.get_filme),
     path('filmes/api/filmesassistido/post/', csrf_exempt(views.set_filme_assistido)),
     path('filmes/api/anosmeta/', views.lista_anosmeta),
+    path('filmes/api/anosmeta/put/', csrf_exempt(views.altera_ano_meta)),
     path('filmes/api/anosmeta/<int:ano>', views.get_anometa),
 ]
