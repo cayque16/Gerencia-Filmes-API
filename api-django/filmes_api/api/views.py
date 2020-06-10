@@ -52,7 +52,12 @@ def get_anometa(request,ano):
     try:
         ano_meta = Anometa.objects.get(ano=ano)
     except Exception:
-        return JsonResponse(dados)    
+        Anometa.objects.create(
+            usuario = User.objects.get(id=1),
+            ano = ano,
+            meta = 100
+        )
+        ano_meta = Anometa.objects.get(ano=ano)
     dados['id'] = ano_meta.id
     dados['ano'] = ano_meta.ano
     dados['meta'] = ano_meta.meta
