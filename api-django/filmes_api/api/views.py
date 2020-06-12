@@ -88,30 +88,36 @@ def altera_ano_meta(request):
 
 def set_filme_assistido(request):
     body = json.loads(request.body)
-    try:
-        filme = Filmes.objects.get(imdbid=body['imdbId'])
-    except Exception:
-        Filmes.objects.create(
-            imdbid = body['imdbId'],
-            titulo = body['titulo'],
-            ano = body['ano'],
-            duracao = body['duracao'],
-            nota = body['nota'],
-            poster = body['poster']
+    if body['id'] == 0:
+        try:
+            filme = Filmes.objects.get(imdbid=body['imdbId'])
+        except Exception:
+            Filmes.objects.create(
+                imdbid = body['imdbId'],
+                titulo = body['titulo'],
+                ano = body['ano'],
+                duracao = body['duracao'],
+                nota = body['nota'],
+                poster = body['poster']
+            )
+            filme = Filmes.objects.get(imdbid=body['imdbId'])
+        ano = body['data'].split('/')[2]
+        anoMeta = Anometa.objects.get(ano=ano)
+        maxPosDoAno = Filmesassistidos.objects.filter(idanometa=anoMeta).aggregate(Max('posano'))
+        posAno = maxPosDoAno['posano__max'] + 1
+        user = User.objects.get(id=1)
+        Filmesassistidos.objects.create(
+            idfilme = filme,
+            usuario = user, #aqui vai o usuario logado
+            idanometa = anoMeta,
+            posano = posAno,
+            data = datetime.strptime(body['data'], '%d/%m/%Y').date(),
+            inedito = body['inedito']
         )
-        filme = Filmes.objects.get(imdbid=body['imdbId'])
-    ano = body['data'].split('/')[2]
-    anoMeta = Anometa.objects.get(ano=ano)
-    maxPosDoAno = Filmesassistidos.objects.filter(idanometa=anoMeta).aggregate(Max('posano'))
-    posAno = maxPosDoAno['posano__max'] + 1
-    user = User.objects.get(id=1)
-    Filmesassistidos.objects.create(
-        idfilme = filme,
-        usuario = user, #aqui vai o usuario logado
-        idanometa = anoMeta,
-        posano = posAno,
-        data = datetime.strptime(body['data'], '%d/%m/%Y').date(),
-        inedito = body['inedito']
-    )
+    else:
+        filmeAssistido = Filmesassistidos.objects.get(id=body['id'])
+        filmeAssistido.inedito = body['inedito']
+        filmeAssistido.data = datetime.strptime(body['data'], '%d/%m/%Y').date()
+        filmeAssistido.save()
 
     return JsonResponse({},status=200)
