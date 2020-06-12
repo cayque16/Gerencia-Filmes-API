@@ -3,6 +3,9 @@ from api.models import Filmes,Anometa,Filmesassistidos
 from django.http.response import JsonResponse
 from django.db.models import Max
 from django.contrib.auth.models import User
+from rest_framework.decorators import api_view, permission_classes,authentication_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 import json
 from datetime import datetime
 
@@ -63,6 +66,7 @@ def get_anometa(request,ano):
     dados['meta'] = ano_meta.meta
     return JsonResponse(dados)
 
+@api_view(['GET'])
 def get_filme(request,id):
     dados = {}
     try:

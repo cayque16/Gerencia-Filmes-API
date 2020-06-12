@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework_jwt.views import obtain_jwt_token,refresh_jwt_token
 from api import views
 
 urlpatterns = [
@@ -27,4 +28,6 @@ urlpatterns = [
     path('filmes/api/anosmeta/', views.lista_anosmeta),
     path('filmes/api/anosmeta/put/', csrf_exempt(views.altera_ano_meta)),
     path('filmes/api/anosmeta/<int:ano>', views.get_anometa),
+    path('filmes/api/token/', obtain_jwt_token),
+    path('filmes/api/refresh-token/', obtain_jwt_token),
 ]
