@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes,authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework import status
+from django.core.exceptions import ObjectDoesNotExist
 import json
 from datetime import datetime
 
@@ -15,14 +17,17 @@ def lista_filmes(request):
     filmes = Filmes.objects.all().values('id','imdbid','titulo')
     return JsonResponse(list(filmes),safe=False)
 
+@api_view(['GET'])
 def lista_filmes_user_do_ano(request,ano):
-    # usuario = request.user
-    ano_meta = Anometa.objects.get(ano=ano)
-    filmes_assistidos = Filmesassistidos.objects.filter(idanometa=ano_meta.id).order_by('-posano')
+    usuario = request.user
+    ano_meta = Anometa.objects.get(ano=ano,usuario=usuario)
+    filmes_assistidos = Filmesassistidos.objects.filter(
+            idanometa=ano_meta.id,
+            usuario=usuario
+        ).order_by('-posano')
     result = []
     for i in filmes_assistidos:
         filme = i.idfilme
-        # print(i.idfilme)
         dados = {}
         dados['id'] = i.id
         dados['idFilme'] = filme.id
@@ -37,10 +42,12 @@ def lista_filmes_user_do_ano(request,ano):
         dados['dataAno'] = i.get_data_ano()
         dados['inedito'] = i.inedito
         result.append(dados)
-    return JsonResponse(result,safe=False)
+    return JsonResponse(result,safe=False,status=status.HTTP_200_OK)
 
+@api_view(['GET'])
 def lista_anosmeta(request):
-    ano_meta = Anometa.objects.all().order_by('-ano')
+    usuario = request.user
+    ano_meta = Anometa.objects.filter(usuario=usuario).order_by('-ano')
     result = []
     for i in ano_meta:
         dados = {}
@@ -48,23 +55,25 @@ def lista_anosmeta(request):
         dados['ano'] = i.ano
         dados['meta'] = i.meta
         result.append(dados)
-    return JsonResponse(result,safe=False)
+    return JsonResponse(result,safe=False,status=status.HTTP_200_OK)
 
+@api_view(['GET'])
 def get_anometa(request,ano):
     dados = {}
+    usuario = request.user
     try:
-        ano_meta = Anometa.objects.get(ano=ano)
+        ano_meta = Anometa.objects.get(ano=ano,usuario=usuario)
     except Exception:
         Anometa.objects.create(
-            usuario = User.objects.get(id=1),
+            usuario = usuario,
             ano = ano,
             meta = 100
         )
-        ano_meta = Anometa.objects.get(ano=ano)
+        ano_meta = Anometa.objects.get(ano=ano,usuario=usuario)
     dados['id'] = ano_meta.id
     dados['ano'] = ano_meta.ano
     dados['meta'] = ano_meta.meta
-    return JsonResponse(dados)
+    return JsonResponse(dados,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_filme(request,id):
@@ -79,18 +88,24 @@ def get_filme(request,id):
     dados['duracao'] = filme.duracao
     dados['nota'] = filme.nota
     dados['poster'] = filme.poster
-    return JsonResponse(dados)
+    return JsonResponse(dados,status=status.HTTP_200_OK)
 
+@api_view(['PUT'])
 def altera_ano_meta(request):
+    user = request.user
     body = json.loads(request.body)
-
-    anoMeta = Anometa.objects.get(ano=body['ano'])
-    anoMeta.meta = body['meta']
-    anoMeta.save()
+    try:
+        anoMeta = Anometa.objects.get(ano=body['ano'],usuario=user)
+        anoMeta.meta = body['meta']
+        anoMeta.save()
+    except ObjectDoesNotExist:
+        return JsonResponse({'erro': 'Ano meta não encontrado'},status=status.HTTP_404_NOT_FOUND)    
     
-    return JsonResponse({},status=200)
+    return JsonResponse({},status=status.HTTP_200_OK)
 
+@api_view(['POST'])
 def set_filme_assistido(request):
+    user = request.user
     body = json.loads(request.body)
     if body['id'] == 0:
         try:
@@ -106,13 +121,15 @@ def set_filme_assistido(request):
             )
             filme = Filmes.objects.get(imdbid=body['imdbId'])
         ano = body['data'].split('/')[2]
-        anoMeta = Anometa.objects.get(ano=ano)
-        maxPosDoAno = Filmesassistidos.objects.filter(idanometa=anoMeta).aggregate(Max('posano'))
-        posAno = maxPosDoAno['posano__max'] + 1
-        user = User.objects.get(id=1)
+        anoMeta = Anometa.objects.get(ano=ano,usuario=user)
+        maxPosDoAno = Filmesassistidos.objects.filter(idanometa=anoMeta,usuario=user).aggregate(Max('posano'))
+        if (maxPosDoAno['posano__max'] != None):
+            posAno = maxPosDoAno['posano__max'] + 1
+        else:
+            posAno = 1
         Filmesassistidos.objects.create(
             idfilme = filme,
-            usuario = user, #aqui vai o usuario logado
+            usuario = user,
             idanometa = anoMeta,
             posano = posAno,
             data = datetime.strptime(body['data'], '%d/%m/%Y').date(),
@@ -124,4 +141,4 @@ def set_filme_assistido(request):
         filmeAssistido.data = datetime.strptime(body['data'], '%d/%m/%Y').date()
         filmeAssistido.save()
 
-    return JsonResponse({},status=200)
+    return JsonResponse({},status=status.HTTP_201_CREATED)
