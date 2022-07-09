@@ -122,4 +122,5 @@ dmypy.json
 
 my.cnf
 gerar-SQL-em-massa/venv
+api-django/filmes_api/.env
 # End of https://www.gitignore.io/api/django
