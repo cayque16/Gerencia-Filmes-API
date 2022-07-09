@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+
+  web:
+    container_name: filmes-api
+    build: .
+    restart: always
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ../api-django/filmes_api/:/code
+    ports:
+      - 8000:8000
+
+networks:
+  default:
+    name: mysql_default
+    external: true
