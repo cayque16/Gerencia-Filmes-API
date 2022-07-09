@@ -9,7 +9,6 @@ api/config.py
 *.pyc
 __pycache__/
 local_settings.py
-api-django/filmes_api/filmes_api/settings.py
 db.sqlite3
 db.sqlite3-journal
 media
@@ -121,4 +120,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+my.cnf
+gerar-SQL-em-massa/venv
 # End of https://www.gitignore.io/api/django
